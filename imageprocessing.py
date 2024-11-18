@@ -161,4 +161,38 @@ def background_removal(input_path: str, output_path: str, kernel_size: int=15, m
         output_file_path = os.path.join(output_path, f"bg_removed_{image_file}")
         cv2.imwrite(output_file_path, result)
 
-background_removal("dataset/contrast enhanced/", "dataset/background removal/")
+#background_removal("dataset/contrast enhanced/", "dataset/background removal/")
+
+def normalizing_images(input_path: str, output_path: str):
+    """
+    Standardizes image intensity for consistency
+
+    Parameters:
+        input_path (str): Path to the directory containing the images.
+        output_path (str): Path to save the background-removed images.
+
+    """
+    # Ensure the output directory exists
+    os.makedirs(output_path, exist_ok=True)
+
+    # read images
+    images = [file for file in os.listdir(input_path) if file.lower().endswith(('.jpg'))]
+
+    for image_file in images:
+        # read the image
+        image_path = os.path.join(input_path, image_file)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+        if image is None:
+            print(f"Skipping invalid image file: {image_file}")
+            continue
+
+        
+        # Normalize pixel values to range [0, 255]
+        image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+
+        # save result
+        output_file_path = os.path.join(output_path, f"bg_removed_{image_file}")
+        cv2.imwrite(output_file_path, image)
+
+normalizing_images("dataset/background removal/", "dataset/normalized/")
